@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="yucs 教學入口，提供電子學與實習的互動教材。">
+  <title>yucs 教學入口</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #f0f2f5;
+      --surface: #fff;
+      --ink: #282333;
+      --muted: #4e4659;
+      --accent: #5a2d82;
+      --accent-dark: #3a1a5c;
+      --accent-light: #f5f0fc;
+      --line: #e0d0f0;
+      --font: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--background);
+      color: var(--ink);
+      font-family: var(--font);
+      line-height: 1.55;
+    }
+    .shell { width: min(1600px, calc(100% - clamp(32px, 7vw, 128px))); margin-inline: auto; }
+    .skip-link { position: absolute; z-index: 1; left: 16px; top: 16px; padding: 8px 12px; background: var(--surface); }
+    .skip-link:not(:focus) { clip-path: inset(50%); }
+    .masthead { border-top: 5px solid var(--accent); background: var(--surface); }
+    .masthead .shell {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding-block: clamp(18px, 2vw, 29px);
+    }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(2.1rem, 4vw, 3.1rem); color: var(--accent-dark); line-height: 1.15; }
+    .masthead p { margin-top: 8px; color: var(--muted); }
+    .circuit-mark { flex: 0 1 230px; min-width: 0; color: var(--accent); }
+    main { flex: 1; padding-block: 22px 32px; }
+    .catalog-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px 24px;
+      margin-bottom: 16px;
+      padding: 12px 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--accent-light);
+    }
+    .subject-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+    label { color: var(--accent-dark); font-weight: 700; }
+    select {
+      min-height: 42px;
+      max-width: 100%;
+      width: 200px;
+      padding: 6px 34px 6px 12px;
+      border: 1px solid #a88fbb;
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--ink);
+      font: inherit;
+    }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .count { color: var(--muted); align-self: center; font-variant-numeric: tabular-nums; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: minmax(172px, 1fr);
+      gap: 14px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+      padding: 16px 18px;
+      border: 1px solid var(--card-line, #c4dbce);
+      border-top: 3px solid var(--card-mark, #6e9b83);
+      border-radius: 12px;
+      background: var(--card-fill, #e9f4ed);
+    }
+    .card:nth-child(8n+2 of .card:not([hidden])),
+    .card:nth-child(8n+5 of .card:not([hidden])) {
+      --card-fill: #eaf1fa; --card-line: #c5d5ea; --card-mark: #758fb4;
+    }
+    .card:nth-child(8n+3 of .card:not([hidden])),
+    .card:nth-child(8n+8 of .card:not([hidden])) {
+      --card-fill: #f8f1e2; --card-line: #e2d4b6; --card-mark: #ab9161;
+    }
+    .card:nth-child(8n+4 of .card:not([hidden])),
+    .card:nth-child(8n+7 of .card:not([hidden])) {
+      --card-fill: #f4edf8; --card-line: #ded0e8; --card-mark: #a688b5;
+    }
+    .card h3 { font-size: 1.24rem; line-height: 1.35; overflow-wrap: anywhere; }
+    .card p { color: var(--muted); }
+    .entry {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 40px;
+      margin-top: auto;
+      padding: 6px 12px;
+      border-radius: 7px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .entry:hover { background: var(--accent-dark); }
+    .empty { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    footer { padding-block: 14px; border-top: 1px solid #d9d4df; color: var(--muted); font-size: .88rem; }
+    footer .shell { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 18px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: minmax(0, 1fr); }
+      .circuit-mark { display: none; }
+      .catalog-toolbar { padding-inline: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#catalog">跳至教材清單</a>
+  <header class="masthead">
+    <div class="shell">
+      <div>
+        <h1>yucs 教學入口</h1>
+        <p>選擇科目，開啟課堂互動教材。</p>
+      </div>
+      <svg class="circuit-mark" viewBox="0 0 230 74" width="230" height="74" aria-hidden="true"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 24h41l9-8 9 16 9-16 9 16 9-16 9 8h40m0-10v20m19-20v20m0-10h48M34 24v31h76m0-10v20l16-10z m16-10v20m0-10h44v6m-9 0h18m-15 5h12m-9 5h6"/>
+        <circle cx="10" cy="24" r="3"/><circle cx="218" cy="24" r="3"/>
+        <circle cx="34" cy="24" r="2" fill="currentColor"/>
+      </svg>
+    </div>
+  </header>
+  <main class="shell" id="catalog" tabindex="-1" aria-labelledby="catalog-title">
+    <h2 id="catalog-title" class="sr-only">教材清單</h2>
+    <div class="catalog-toolbar">
+      <div class="subject-picker">
+        <label for="subject">科目</label>
+        <select id="subject" aria-controls="cards">
+          $subject_options
+        </select>
+      </div>
+      <p class="count" id="count" role="status">$initial_count 項教材</p>
+    </div>
+    <ul class="grid" id="cards" role="list">
+      $cards
+    </ul>
+    <p class="empty" id="empty" $empty_state>這個科目目前沒有已發布的教材。</p>
+  </main>
+  <footer>
+    <div class="shell">
+      <span>© $year yucs. 版權所有。</span>
+      <span>程式部署時間：<time datetime="$iso_time">$display_time</time></span>
+    </div>
+  </footer>
+  <script>
+    const subject = document.querySelector("#subject");
+    const cards = document.querySelectorAll("#cards .card");
+    const count = document.querySelector("#count");
+    const empty = document.querySelector("#empty");
+
+    function showSubject() {
+      let visible = 0;
+      for (const card of cards) {
+        card.hidden = card.dataset.subject !== subject.value;
+        visible += Number(!card.hidden);
+      }
+      count.textContent = visible + " 項教材";
+      empty.hidden = visible > 0;
+    }
+
+    subject.addEventListener("change", showSubject);
+    window.addEventListener("pageshow", showSubject);
+    showSubject();
+  </script>
+</body>
+</html>

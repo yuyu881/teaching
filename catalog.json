@@ -1,0 +1,18 @@
+[
+  {
+    "id": "electronics-lab",
+    "name": "電子學與實習",
+    "materials": [
+      {
+        "title": "菊鍊串接電路",
+        "description": "透過動畫追蹤電流與 LED 導通順序，搭配 PCB Layout 核對元件位置、極性與走線。",
+        "url": "https://yuyu881.github.io/daisy-chain-circuit/"
+      },
+      {
+        "title": "FET_JFET_MOSFET 教學動畫",
+        "description": "透過動畫、特性曲線與虛擬電表理解 JFET、MOSFET，並練習辨識接腳。",
+        "url": "https://yuyu881.github.io/FET_JFET_MOSFET/"
+      }
+    ]
+  }
+]
