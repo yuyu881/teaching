@@ -35,16 +35,77 @@
     .skip-link:not(:focus) { clip-path: inset(50%); }
     .masthead { border-top: 5px solid var(--accent); background: var(--surface); }
     .masthead .shell {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(0, 2fr);
       align-items: center;
-      gap: 24px;
-      padding-block: clamp(18px, 2vw, 29px);
+      gap: clamp(18px, 3vw, 50px);
+      padding-block: 11px;
     }
     h1, h2, h3, p { margin: 0; }
     h1 { font-size: clamp(2.1rem, 4vw, 3.1rem); color: var(--accent-dark); line-height: 1.15; }
-    .masthead p { margin-top: 8px; color: var(--muted); }
-    .circuit-mark { flex: 0 1 230px; min-width: 0; color: var(--accent); }
+    .masthead-copy p { margin-top: 5px; color: var(--muted); }
+    .hero-lesson {
+      min-width: 0;
+      margin: 0;
+      border: 1px solid #dedbe6;
+      border-radius: 13px;
+      background: #faf9fc;
+    }
+    .hero-art {
+      display: block;
+      width: 100%;
+      height: clamp(87px, 6.8vw, 119px);
+      border-radius: 12px 12px 0 0;
+      background: #f3f5ef;
+    }
+    .hero-controls {
+      min-height: 39px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+      border-top: 1px solid #dedbe6;
+      padding: 3px 9px 3px 12px;
+      color: #4e4659;
+      font-size: .92rem;
+    }
+    .hero-caption { font-weight: 700; color: #453752; }
+    .hero-actions { display: flex; gap: 5px; margin-inline-start: auto; }
+    .hero-actions button {
+      min-height: 32px;
+      padding: 3px 11px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--accent-dark);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .hero-actions button[aria-pressed="true"] { background: #ece2f6; border-color: #d8c6e8; }
+    .hero-actions button:hover { background: #f0e6f7; }
+    .hero-actions .hero-play { margin-left: 3px; border-color: #d7ccdf; background: #fff; }
+    .hero-play-mark { display: inline-block; width: 13px; text-align: center; font-size: .82em; }
+    @media (max-width: 760px) {
+      .masthead .shell { grid-template-columns: minmax(0, 1fr); gap: 7px; padding-block: 8px; }
+      .masthead h1 { font-size: clamp(1.5rem, 4.7vw, 2rem); }
+      .masthead-copy p { margin-top: 4px; font-size: .84rem; line-height: 1.4; }
+      .hero-art { height: clamp(76px, 12.7vw, 96px); }
+      .hero-controls { display: grid; grid-template-columns: minmax(0, 1fr) max-content; padding-left: 9px; }
+      .hero-caption { line-height: 1.2; }
+    }
+    @media (min-width: 521px) and (max-width: 760px) {
+      .masthead .shell { gap: 5px; padding-block: 5px; }
+      .hero-art { height: clamp(76px, 12.7vw, 89px); }
+    }
+    @media (max-width: 390px) {
+      .hero-actions button { padding-inline: 7px; }
+      .hero-caption { font-size: .77rem; }
+    }
+    @media (max-width: 340px) {
+      .hero-controls { min-height: 46px; }
+    }
     main { flex: 1; padding-block: 22px 32px; }
     .catalog-toolbar {
       display: flex;
@@ -129,7 +190,6 @@
     @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 560px) {
       .grid { grid-template-columns: minmax(0, 1fr); }
-      .circuit-mark { display: none; }
       .catalog-toolbar { padding-inline: 12px; }
     }
   </style>
@@ -138,16 +198,23 @@
   <a class="skip-link" href="#catalog">跳至教材清單</a>
   <header class="masthead">
     <div class="shell">
-      <div>
+      <div class="masthead-copy">
         <h1>yucs 教學入口</h1>
         <p>選擇科目，開啟課堂互動教材。</p>
       </div>
-      <svg class="circuit-mark" viewBox="0 0 230 74" width="230" height="74" aria-hidden="true"
-        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M13 24h41l9-8 9 16 9-16 9 16 9-16 9 8h40m0-10v20m19-20v20m0-10h48M34 24v31h76m0-10v20l16-10z m16-10v20m0-10h44v6m-9 0h18m-15 5h12m-9 5h6"/>
-        <circle cx="10" cy="24" r="3"/><circle cx="218" cy="24" r="3"/>
-        <circle cx="34" cy="24" r="2" fill="currentColor"/>
-      </svg>
+      <figure class="hero-lesson" aria-label="電子學實習動畫導覽">
+        <canvas class="hero-art" id="hero-art" role="img" aria-label="菊鍊串接電路，十級 LED 紅綠交錯逐級導通">
+          菊鍊串接電路依序點亮十顆 LED。N 通道 MOSFET 由閘極電壓控制導通。
+        </canvas>
+        <figcaption class="hero-controls">
+          <span class="hero-caption" id="hero-caption">逐級導通（慢動作）</span>
+          <div class="hero-actions" role="group" aria-label="動畫控制">
+            <button type="button" id="show-chain" aria-pressed="true" aria-controls="hero-art">菊鍊串接</button>
+            <button type="button" id="show-fet" aria-pressed="false" aria-controls="hero-art">FET</button>
+            <button type="button" class="hero-play" id="hero-play" aria-controls="hero-art"><span class="hero-play-mark" aria-hidden="true">❚❚</span> <span id="hero-play-label">暫停</span></button>
+          </div>
+        </figcaption>
+      </figure>
     </div>
   </header>
   <main class="shell" id="catalog" tabindex="-1" aria-labelledby="catalog-title">
@@ -191,6 +258,398 @@
     subject.addEventListener("change", showSubject);
     window.addEventListener("pageshow", showSubject);
     showSubject();
+  </script>
+  <script>
+    (() => {
+      const art = document.querySelector("#hero-art");
+      const caption = document.querySelector("#hero-caption");
+      const context = art.getContext("2d");
+      const buttons = ["#show-chain", "#show-fet"].map((id) => document.querySelector(id));
+      const toggle = document.querySelector("#hero-play");
+      const toggleLabel = document.querySelector("#hero-play-label");
+      const toggleMark = toggle.querySelector(".hero-play-mark");
+      const motion = matchMedia("(prefers-reduced-motion: reduce)");
+      const duration = 8000;
+      const summary = [
+        ["逐級導通（慢動作）", "菊鍊串接電路，十級 LED 由左到右依序導通，奇數級綠色，偶數級紅色。"],
+        ["N 通道 MOSFET", "N 通道增強型 MOSFET，閘極電壓升高時形成通道，傳統電流由 D 流向 S。"],
+      ];
+      let scene = 0;
+      let elapsed = motion.matches ? 6200 : 0;
+      let playing = !motion.matches;
+      let last = null;
+      let frame = 0;
+      let width = 800;
+      let previousScene = null;
+      const height = 180;
+
+      const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
+
+      function box(x, y, w, h, radius, fill, stroke) {
+        context.beginPath();
+        context.roundRect(x, y, w, h, radius);
+        context.fillStyle = fill;
+        context.fill();
+        if (stroke) {
+          context.lineWidth = 1;
+          context.strokeStyle = stroke;
+          context.stroke();
+        }
+      }
+
+      function circle(x, y, radius, fill, stroke) {
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.fillStyle = fill;
+        context.fill();
+        if (stroke) {
+          context.lineWidth = 1;
+          context.strokeStyle = stroke;
+          context.stroke();
+        }
+      }
+
+      function line(points, color, thickness = 1) {
+        context.beginPath();
+        points.forEach(([x, y], index) => index ? context.lineTo(x, y) : context.moveTo(x, y));
+        context.lineWidth = thickness;
+        context.lineJoin = "round";
+        context.lineCap = "round";
+        context.strokeStyle = color;
+        context.stroke();
+      }
+
+      function gradient(y, end, colors) {
+        const fill = context.createLinearGradient(0, y, 0, end);
+        colors.forEach((color, index) => fill.addColorStop(index / (colors.length - 1), color));
+        return fill;
+      }
+
+      function label(text, x, y, { size = 11, color = "#34414d", align = "center", weight = 700 } = {}) {
+        context.fillStyle = color;
+        context.font = weight + " " + size + "px Microsoft JhengHei, sans-serif";
+        context.textAlign = align;
+        context.textBaseline = "middle";
+        context.fillText(text, x, y);
+      }
+
+      function signal(points, position, color, glow) {
+        const cuts = [0];
+        for (let i = 1; i < points.length; i++) {
+          cuts.push(cuts.at(-1) + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]));
+        }
+        const at = (distance) => {
+          const safe = clamp(distance, 0, cuts.at(-1));
+          const index = Math.max(1, cuts.findIndex((cut) => cut >= safe));
+          const fraction = (safe - cuts[index - 1]) / (cuts[index] - cuts[index - 1]);
+          return points[index - 1].map((value, side) => value + (points[index][side] - value) * fraction);
+        };
+        const distance = cuts.at(-1) * clamp(position);
+        const head = at(distance);
+        const tailAt = Math.max(0, distance - 15);
+        const trail = [at(tailAt), ...points.filter((_, i) => cuts[i] > tailAt && cuts[i] < distance), head];
+        context.save();
+        context.shadowColor = glow;
+        context.shadowBlur = 10;
+        line(trail, color, 2.8);
+        circle(...head, 2.6, "#fff9de");
+        context.restore();
+      }
+
+      function backdrop(top, base, grid) {
+        context.fillStyle = gradient(0, height, [top, base]);
+        context.fillRect(0, 0, width, height);
+        for (let y = 9; y < height; y += 12) {
+          for (let x = 10; x < width; x += 12) {
+            context.fillStyle = grid;
+            context.fillRect(x, y, 1, 1);
+          }
+        }
+      }
+
+      function diode(x, y, reversed, spacing) {
+        const half = clamp(spacing * .19, 7, 14);
+        line([[x - half - 6, y], [x + half + 6, y]], "#817559", 1.4);
+        box(x - half, y - 3.4, half * 2, 7, 3.4, gradient(y - 4, y + 4, ["#fbcea3", "#d37746", "#8e523a"]), "#965b40");
+        line([[x - half + 3, y - 2], [x + half - 3, y - 2]], "#ffe1ad", .9);
+        const band = x + (reversed ? -1 : 1) * (half - 3.6);
+        line([[band, y - 3], [band, y + 3]], "#3f332f", 2.4);
+      }
+
+      function resistor(x, y) {
+        box(x - 3.3, y - 7.2, 6.6, 14.4, 2.7, gradient(y - 7, y + 7, ["#eee2b9", "#cfb77f", "#ad9467"]), "#a48a5e");
+        line([[x - 2.7, y - 3.8], [x + 2.7, y - 3.8]], "#76502d", 1.3);
+        line([[x - 2.7, y - 1.2], [x + 2.7, y - 1.2]], "#363430", 1.25);
+        line([[x - 2.7, y + 1.7], [x + 2.7, y + 1.7]], "#a84538", 1.25);
+        line([[x - 2.7, y + 4.6], [x + 2.7, y + 4.6]], "#9d7b34", 1.2);
+      }
+
+      function led(x, y, green, light) {
+        const active = green ? ["#efffd0", "#82e68e", "#319561"] : ["#ffe9d9", "#f37872", "#a8343b"];
+        const dark = green ? ["#9cc7ae", "#54886f", "#34624e"] : ["#d6a396", "#ad665d", "#793c36"];
+        const colors = light > .35 ? active : dark;
+        line([[x - 6, y + 6], [x - 6, y + 19]], "#a4a798", 2.3);
+        line([[x + 6, y + 6], [x + 6, y + 19]], "#e3dbc1", 2.1);
+        circle(x - 6, y + 20, 3, "#ceb482", "#7b8b65");
+        circle(x + 6, y + 20, 3, "#ceb482", "#7b8b65");
+        context.save();
+        if (light > .35) {
+          const halo = context.createRadialGradient(x, y, 3, x, y, 24);
+          halo.addColorStop(0, green ? "#b6ff98b3" : "#ff8c86b5");
+          halo.addColorStop(1, "#ffffff00");
+          circle(x, y, 24, halo);
+        }
+        box(x - 11, y - 12, 22, 23, [10, 10, 3, 3], gradient(y - 12, y + 11, colors), colors[2]);
+        box(x - 13, y + 7, 26, 5, 2, colors[1], colors[2]);
+        box(x - 6.5, y - 8, 4, 11, 2, "#ffffff8a");
+        if (light > .35) circle(x + 1, y - 1, 3.7, active[0]);
+        context.restore();
+      }
+
+      function transistor(x, y) {
+        for (let i = -1; i <= 1; i++) {
+          line([[x + i * 3.5, y + 3], [x + i * 5.5, y + 11]], "#d0b992", 1.6);
+        }
+        box(x - 9, y - 7, 18, 13, [6, 6, 2.5, 2.5], gradient(y - 7, y + 6, ["#596963", "#273b34", "#1b332b"]), "#243b33");
+        line([[x - 5, y - 4], [x + 4, y - 4]], "#9aa69ecd", .8);
+      }
+
+      function drawChain(ms) {
+        backdrop("#f7f7ef", "#eff4ed", "#6b8b7929");
+        const board = { x: 14, y: 13, w: width - 28, h: 150 };
+        const left = board.x + 34;
+        const spacing = (board.w - 68) / 9;
+        const compact = spacing < 48;
+        context.save();
+        context.shadowBlur = 13;
+        context.shadowColor = "#53705854";
+        context.shadowOffsetY = 7;
+        box(board.x, board.y + 3, board.w, board.h + 3, 12, "#7b9879");
+        context.restore();
+        box(board.x, board.y, board.w, board.h, 11, gradient(13, 163, ["#e2efdd", "#c3dfce", "#a8c9b3"]), "#779980");
+        box(board.x + 5, board.y + 5, board.w - 10, board.h - 10, 8, "#ffffff04", "#f5ffeaab");
+        for (const x of [board.x + 16, board.x + board.w - 16]) {
+          for (const y of [board.y + 16, board.y + board.h - 16]) {
+            circle(x, y, 4.8, "#819980", "#e8e6c9");
+            circle(x, y, 2.1, "#647e6d");
+          }
+        }
+        const start = left - 13;
+        const end = width - left + 13;
+        line([[start, 41], [end, 41]], "#a8794b", 2.2);
+        line([[start, 149], [end, 149]], "#7b9479", 2.2);
+        label("+5 V", start, 29, { align: "left", color: "#77512e", size: 10.5 });
+        label("GND", end, 157, { align: "right", color: "#45584a", size: 10 });
+
+        for (let i = 0; i < 10; i++) {
+          const x = left + i * spacing;
+          for (const y of [50, 101, 111, 138]) {
+            circle(x - 13, y, 1.6, "#9fb59e", "#e2ead6");
+            circle(x + 13, y, 1.6, "#9fb59e", "#e2ead6");
+          }
+          const upper = [[x - 9, 41], [x - 9, 76], [x - 6, 90]];
+          const lower = [[x + 6, 90], [x + 6, 113], [x, 120], [x, 149]];
+          line(upper, "#bb966a", 1.6);
+          line(lower, "#9a9168", 1.6);
+          circle(x - 9, 41, 2, "#dfb67b");
+          circle(x, 149, 2, "#d2c89c");
+          if (i < 9) {
+            const next = x + spacing;
+            const route = [[x + 8, 127], [x + 8, 109], [x + 15, 103], [next - 16, 103], [next - 8, 110], [next - 8, 127]];
+            line(route, "#ac8358", 1.55);
+            diode((x + next) / 2, 103, i % 2 === 1, spacing);
+            const phase = (ms - (870 + (i + 1) * 465 - 420)) / 420;
+            if (phase > 0 && phase < 1) signal(i % 2 ? route.slice().reverse() : route, phase, "#ffe9a4", "#ffefb4");
+          }
+          const timeOn = ms - (870 + i * 465);
+          resistor(x + 6, 104);
+          transistor(x, 128);
+          led(x, 70, i % 2 === 0, clamp(timeOn / 220));
+          if (timeOn > 0 && timeOn < 650) signal(lower, timeOn / 650, "#fff3b2", "#fff2bd");
+          if (!compact || i === 0 || i === 9) label("LED" + (i + 1), x, 52, { size: 9.5, color: "#3a5547" });
+          label("Q" + (i + 1), x, 143, { size: 9, color: "#2e493b" });
+        }
+      }
+
+      function packageDrawing(x, y, size) {
+        const w = size;
+        const h = size * .78;
+        const lead = size * .23;
+        for (const [index, pin] of ["D", "G", "S"].entries()) {
+          const offset = (index - 1) * w * .27;
+          const tip = offset * 1.25;
+          line([[x + offset, y + h - 2], [x + offset, y + h + 8], [x + tip, y + h + 15], [x + tip, y + h + lead]], "#777e87", 4);
+          line([[x + offset - 1, y + h - 2], [x + offset - 1, y + h + 8], [x + tip - 1, y + h + 15], [x + tip - 1, y + h + lead]], "#d8dee2", 1.5);
+          label(pin, x + tip, y + h + lead + 13, { size: 11, color: "#445066" });
+        }
+        context.save();
+        context.shadowBlur = 12;
+        context.shadowOffsetY = 5;
+        context.shadowColor = "#33405837";
+        box(x - w / 2, y, w, h, [w * .3, w * .3, 6, 6], gradient(y, y + h, ["#74828c", "#33414d", "#1f2832"]), "#23313e");
+        context.restore();
+        box(x - w * .39, y + h * .17, w * .78, h * .73, [w * .22, w * .22, 3, 3], gradient(y + 7, y + h, ["#566472", "#354453", "#28313b"]));
+        line([[x - w * .2, y + 6], [x + w * .2, y + 6]], "#c2c9d580");
+        label("MOSFET", x, y + h * .57, { size: Math.min(w * .19, 15), color: "#edf2fa" });
+      }
+
+      function drawFet(ms) {
+        backdrop("#f7f7f9", "#eef3f4", "#71879930");
+        const narrow = width < 560;
+        const split = width * (narrow ? .32 : .30);
+        const packageSize = narrow ? 74 : 102;
+        const packageX = split * .49 + 7;
+        packageDrawing(packageX, narrow ? 44 : 27, packageSize);
+        line([[split - 21, 100], [split + 14, 100]], "#a6a9b8", 1.3);
+        line([[split + 9, 96], [split + 14, 100], [split + 9, 104]], "#a6a9b8", 1.3);
+
+        const left = split + 30;
+        const right = width - 25;
+        const span = right - left;
+        const mid = (left + right) / 2;
+        const side = span * .19;
+        const drain = left + side * .65;
+        const source = right - side * .65;
+        const gateWidth = span * .43;
+        const field = clamp((ms - 1000) / 1700);
+        const channel = clamp((ms - 2500) / 550);
+        const active = channel > .55;
+        const surface = 83;
+
+        context.save();
+        context.shadowColor = "#5964834a";
+        context.shadowBlur = 12;
+        context.shadowOffsetY = 5;
+        box(left, surface + 6, span, 57, 7, "#9d9ebc");
+        context.restore();
+        box(left, surface, span, 59, [4, 4, 7, 7], gradient(surface, 142, ["#dedbed", "#c5c8df", "#aeb7d2"]), "#8a94b5");
+        line([[left + 1, surface + 54], [right - 1, surface + 54]], "#e6ebf483");
+
+        for (const [pin, x, start] of [["D", drain, left + 3], ["S", source, right - side - 3]]) {
+          box(start, surface, side, 25, [2, 2, 9, 9], gradient(surface, 109, ["#8db8cf", "#7e9dbd", "#6b87b0"]), "#6e90af");
+          box(x - 3.4, 52, 6.8, surface - 52, 2, "#ae9678", "#8f795e");
+          circle(x, 51, 4.4, "#e8d8b4", "#927861");
+          label(pin, x, 35);
+          label("N+", start + side / 2, 96, { size: narrow ? 10 : 12, color: "#263951" });
+        }
+        const oxide = gradient(75, 83, ["#f5f9fb", "#dce5ef"]);
+        box(mid - gateWidth * .53, 75, gateWidth * 1.06, 8, 2, oxide, "#c0c4d3");
+        box(mid - gateWidth / 2, 63, gateWidth, 12, 3, gradient(63, 75, ["#e4ca99", "#bc9a66"]), "#ad8a5b");
+        line([[mid, 63], [mid, 44]], "#a2825a", 2.8);
+        circle(mid, 43, 4.4, field > .35 ? "#e8c9ec" : "#eadcc4", "#927861");
+        label("G", mid, 30);
+
+        if (field > 0) {
+          context.save();
+          context.globalAlpha = .7 * field;
+          for (let i = -2; i <= 2; i++) {
+            const x = mid + i * (gateWidth * .16);
+            line([[x, 70], [x, 89], [x + i * 2, 96]], "#9276af", 1.7);
+          }
+          context.restore();
+        }
+        const channelStart = left + side - 1;
+        const channelEnd = right - side + 1;
+        if (channel > 0) {
+          context.save();
+          context.globalAlpha = channel;
+          context.shadowColor = "#9ce8ee";
+          context.shadowBlur = 11;
+          box(channelStart, surface + 1, channelEnd - channelStart, 7, 3, "#62bfd1", "#357e9c");
+          context.restore();
+        }
+        if (active) {
+          const run = [[drain, 68], [drain, 88], [source, 88], [source, 68]];
+          signal(run, ((ms - 2650) % 1350) / 1350, "#c9f8ff", "#9cebf3");
+          const ax = mid - 12;
+          line([[ax, 112], [ax + 24, 112]], "#236984", 1.65);
+          line([[ax + 18, 108], [ax + 24, 112], [ax + 18, 116]], "#236984", 1.65);
+        }
+        label(active ? "通道形成・D → S" : "閘極控制通道", mid, 157, {
+          size: narrow ? 11 : 13, color: active ? "#264f65" : "#4a4e66",
+        });
+      }
+
+      const renderScene = (index, ms) => (index === 0 ? drawChain : drawFet)(ms);
+
+      function render() {
+        context.clearRect(0, 0, width, height);
+        if (previousScene !== null && elapsed < 420) {
+          renderScene(previousScene, duration);
+          context.save();
+          context.globalAlpha = clamp(elapsed / 420);
+          renderScene(scene, elapsed);
+          context.restore();
+          return;
+        }
+        renderScene(scene, elapsed);
+      }
+
+      function resize() {
+        const rect = art.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const scale = Math.min(window.devicePixelRatio || 1, 2);
+        art.width = Math.round(rect.width * scale);
+        art.height = Math.round(rect.height * scale);
+        width = height * rect.width / rect.height;
+        context.setTransform(art.width / width, 0, 0, art.height / height, 0, 0);
+        render();
+      }
+
+      function updateControls() {
+        buttons.forEach((button, index) => button.setAttribute("aria-pressed", String(index === scene)));
+        caption.textContent = summary[scene][0];
+        art.setAttribute("aria-label", summary[scene][1]);
+        toggleLabel.textContent = playing ? "暫停" : "播放";
+        toggleMark.textContent = playing ? "❚❚" : "▶";
+      }
+
+      function tick(now) {
+        frame = 0;
+        if (!playing || document.hidden) return;
+        if (last !== null) elapsed += Math.min(now - last, 100);
+        last = now;
+        if (elapsed >= duration) {
+          previousScene = scene;
+          scene = 1 - scene;
+          elapsed -= duration;
+          updateControls();
+        }
+        render();
+        frame = requestAnimationFrame(tick);
+      }
+
+      function sync() {
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
+        last = null;
+        updateControls();
+        render();
+        if (playing && !document.hidden) frame = requestAnimationFrame(tick);
+      }
+
+      buttons.forEach((button, index) => button.addEventListener("click", () => {
+        previousScene = playing && scene !== index ? scene : null;
+        scene = index;
+        elapsed = playing ? 0 : 6200;
+        sync();
+      }));
+      toggle.addEventListener("click", () => {
+        playing = !playing;
+        sync();
+      });
+      motion.addEventListener("change", (event) => {
+        if (!event.matches) return;
+        playing = false;
+        previousScene = null;
+        elapsed = 6200;
+        sync();
+      });
+      document.addEventListener("visibilitychange", sync);
+      new ResizeObserver(resize).observe(art);
+      resize();
+      sync();
+    })();
   </script>
 </body>
 </html>
